@@ -62,11 +62,11 @@ The app uses `VITE_HOOTCAM_SERVER_URL` (from `.env`) as the API base URL for all
    npm run dev
    ```
 
-   Open http://localhost:5173 in a browser.
+   Open http://localhost:5173 in a browser. If you use WSL, the dev server listens on all interfaces so you can open that URL from a Windows browser.
 
 4. **Sign in (for full access)**
 
-   On the home page you’ll see the public live view and a “Sign in” button. Click it, enter the same HTTP Basic Auth username and password used by the server (API URL is pre-filled from `VITE_HOOTCAM_SERVER_URL`). After a successful login you’ll be redirected to the dashboard with full access.
+   On the home page you’ll see the public live view and a “Sign in” button. Click it and enter the same HTTP Basic Auth username and password used by the server. The app uses the server URL from `VITE_HOOTCAM_SERVER_URL`. After a successful login you’ll be redirected to the dashboard with full access.
 
 ## Environment variables
 
