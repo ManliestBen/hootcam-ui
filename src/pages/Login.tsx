@@ -4,7 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import { createApi, getServerBaseUrl } from '../api/client';
 
 export function Login() {
-  const [apiBaseUrl, setApiBaseUrl] = useState(getServerBaseUrl);
   const [username, setUsername] = useState('admin');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -16,6 +15,7 @@ export function Login() {
     e.preventDefault();
     setError(null);
     setLoading(true);
+    const apiBaseUrl = getServerBaseUrl();
     try {
       const api = createApi({ apiBaseUrl, username, password });
       await api.getInfo();
@@ -36,16 +36,6 @@ export function Login() {
           Sign in with your server credentials (HTTP Basic Auth).
         </p>
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>API base URL</label>
-            <input
-              type="url"
-              value={apiBaseUrl}
-              onChange={(e) => setApiBaseUrl(e.target.value)}
-              placeholder="http://localhost:8080"
-              required
-            />
-          </div>
           <div className="form-group">
             <label>Username</label>
             <input
