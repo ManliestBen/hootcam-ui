@@ -115,6 +115,8 @@ export function createApi(creds: AuthCredentials | null) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(update),
       }),
+    restartServer: () =>
+      request<{ message: string }>(creds, '/restart', { method: 'POST' }),
 
     // Storage
     getStorage: () => request<StorageResponse>(creds, '/storage'),
@@ -137,6 +139,8 @@ export function createApi(creds: AuthCredentials | null) {
       }),
     getCameraStatus: (cameraIndex: number) =>
       request<import('./types').CameraStatus>(creds, `/cameras/${cameraIndex}/status`),
+    getCameraResolutions: (cameraIndex: number) =>
+      request<import('./types').CameraResolution[]>(creds, `/cameras/${cameraIndex}/resolutions`),
 
     // Detection
     detectionStart: (cameraIndex: number) =>

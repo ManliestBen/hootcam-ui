@@ -81,7 +81,7 @@ export function Files() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
         {(files ?? []).map((f) => (
           <div key={f.id} className="card">
-            <FileContentView fileId={f.id} fileType={f.file_type} credentials={credentials} />
+            <FileContentView fileId={f.id} fileType={f.file_type} filePath={f.file_path} credentials={credentials} />
             <p style={{ margin: '0.5rem 0 0', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
               {f.file_type} · {f.timestamp}
               {f.event_id != null && ` · Event ${f.event_id}`}

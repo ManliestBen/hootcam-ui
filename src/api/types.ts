@@ -108,6 +108,12 @@ export interface CameraInfo {
   stream_url: string;
 }
 
+export interface CameraResolution {
+  width: number;
+  height: number;
+  fps: number;
+}
+
 export interface CameraStatus {
   camera_index: number;
   connected: boolean;

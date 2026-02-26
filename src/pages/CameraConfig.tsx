@@ -1,8 +1,22 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import type { CameraConfig as CameraConfigType } from '../api/types';
+import type { CameraConfig as CameraConfigType, CameraResolution } from '../api/types';
+
+/** Commonly used resolutions from 640×480 up to 4608×2592 for camera config. */
+const COMMON_RESOLUTIONS: CameraResolution[] = [
+  { width: 640, height: 480, fps: 0 },
+  { width: 800, height: 600, fps: 0 },
+  { width: 1024, height: 768, fps: 0 },
+  { width: 1280, height: 720, fps: 0 },
+  { width: 1280, height: 960, fps: 0 },
+  { width: 1920, height: 1080, fps: 0 },
+  { width: 2592, height: 1944, fps: 0 },
+  { width: 3280, height: 2464, fps: 0 },
+  { width: 3840, height: 2160, fps: 0 },
+  { width: 4608, height: 2592, fps: 0 },
+];
 
 export function CameraConfig() {
   const { id } = useParams<{ id: string }>();
@@ -16,6 +30,15 @@ export function CameraConfig() {
     queryFn: () => api.getCameraConfig(cameraIndex),
     enabled: Number.isInteger(cameraIndex),
   });
+
+  const { data: apiResolutions = [] } = useQuery({
+    queryKey: ['camera-resolutions', cameraIndex],
+    queryFn: () => api.getCameraResolutions(cameraIndex),
+    enabled: Number.isInteger(cameraIndex),
+  });
+
+  // Use hardware resolutions when available, otherwise common list (so dropdown always works)
+  const resolutions = apiResolutions.length > 0 ? apiResolutions : COMMON_RESOLUTIONS;
 
   useEffect(() => {
     if (!data) return;
@@ -34,16 +57,39 @@ export function CameraConfig() {
     });
   }, [data]);
 
+  const resolutionRestartPending = useRef(false);
+
   const patchMutation = useMutation({
     mutationFn: (update: CameraConfigType) => api.patchCameraConfig(cameraIndex, update),
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['camera-config', cameraIndex] });
       queryClient.invalidateQueries({ queryKey: ['cameras'] });
+      if (resolutionRestartPending.current) {
+        resolutionRestartPending.current = false;
+        try {
+          await api.restartServer();
+        } catch {
+          // Request may fail when server exits; that's expected
+        }
+        setRestartMessage('Server is restarting. Please wait a moment and refresh the page.');
+      }
     },
   });
 
+  const [restartMessage, setRestartMessage] = useState<string | null>(null);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const resolutionChanged =
+      data != null &&
+      (form.width !== data.width || form.height !== data.height);
+    if (resolutionChanged) {
+      const ok = window.confirm(
+        'Changing the resolution will restart the server so the new resolution takes effect. The server will restart automatically after saving. Continue?'
+      );
+      if (!ok) return;
+      resolutionRestartPending.current = true;
+    }
     patchMutation.mutate(form as CameraConfigType);
   };
 
@@ -59,6 +105,11 @@ export function CameraConfig() {
         <Link to={`/cameras/${cameraIndex}`}>← Camera {cameraIndex}</Link>
       </div>
       <h1>Camera {cameraIndex} config</h1>
+      {restartMessage && (
+        <div className="card" style={{ marginBottom: '1rem', background: 'var(--card-bg)', color: 'var(--text)' }}>
+          {restartMessage}
+        </div>
+      )}
       <div className="card" style={{ maxWidth: 560 }}>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
@@ -79,25 +130,40 @@ export function CameraConfig() {
               onChange={(e) => setForm((f) => ({ ...f, camera_id: e.target.value ? parseInt(e.target.value, 10) : undefined }))}
             />
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-            <div className="form-group">
-              <label>Width</label>
-              <input
-                type="number"
-                min={8}
-                value={form.width ?? ''}
-                onChange={(e) => setForm((f) => ({ ...f, width: e.target.value ? parseInt(e.target.value, 10) : undefined }))}
-              />
-            </div>
-            <div className="form-group">
-              <label>Height</label>
-              <input
-                type="number"
-                min={8}
-                value={form.height ?? ''}
-                onChange={(e) => setForm((f) => ({ ...f, height: e.target.value ? parseInt(e.target.value, 10) : undefined }))}
-              />
-            </div>
+          <div className="form-group">
+            <label>Resolution</label>
+            <select
+              value={[form.width, form.height].filter((x) => x != null).join(',') || ''}
+              onChange={(e) => {
+                const v = e.target.value;
+                if (!v) return;
+                const [w, h] = v.split(',').map((n) => parseInt(n, 10));
+                if (Number.isNaN(w) || Number.isNaN(h)) return;
+                const res = resolutions.find((r) => r.width === w && r.height === h);
+                setForm((f) => ({
+                  ...f,
+                  width: w,
+                  height: h,
+                  framerate: res?.fps ?? f.framerate,
+                }));
+              }}
+            >
+              <option value="">Select resolution…</option>
+              {resolutions.map((r) => (
+                <option key={`${r.width}x${r.height}`} value={`${r.width},${r.height}`}>
+                  {r.width} × {r.height}
+                  {r.fps > 0 ? ` (up to ${r.fps} fps)` : ''}
+                </option>
+              ))}
+              {form.width != null && form.height != null && !resolutions.some((r) => r.width === form.width && r.height === form.height) && (
+                <option value={`${form.width},${form.height}`}>Current: {form.width} × {form.height}</option>
+              )}
+            </select>
+            <p style={{ margin: '0.25rem 0 0', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+              {apiResolutions.length > 0
+                ? 'Values from the connected camera hardware. Restart the server after changing resolution.'
+                : 'Common resolutions. Restart the server after changing resolution.'}
+            </p>
           </div>
           <div className="form-group">
             <label>Framerate</label>
