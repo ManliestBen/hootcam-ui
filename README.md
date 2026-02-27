@@ -8,9 +8,9 @@ Hootcam can run as three separate apps:
 
 | App | Where it runs | Role |
 |-----|----------------|------|
-| **Hootcam UI** (this repo) | Any device with a browser | Web interface: live view, detection controls, events, files, config. |
-| **Hootcam Motion** | NUC or PC | Consumes RTSP streams, runs motion detection and recording, serves the REST API and MJPEG streams. **This is the server the UI talks to.** |
-| **Hootcam Streamer** | Raspberry Pi | Publishes two RTSP streams (cam0, cam1) from CSI cameras. No motion or recording. |
+| **Hootcam UI** ([hootcam-ui](https://github.com/ManliestBen/hootcam-ui)) | Any device with a browser | Web interface: live view, detection controls, events, files, config. |
+| [**Hootcam Motion**](https://github.com/ManliestBen/hootcam-motion) | NUC or PC | Consumes RTSP streams, runs motion detection and recording, serves the REST API and MJPEG streams. **This is the server the UI talks to.** |
+| [**Hootcam Streamer**](https://github.com/ManliestBen/hootcam-streamer) | Raspberry Pi | Publishes two RTSP streams (cam0, cam1) from CSI cameras. No motion or recording. |
 
 You point the UI at **Hootcam Motion** (the NUC). Motion pulls video from the Pi’s RTSP streams and does all processing. No direct connection from the UI to the Pi is required.
 
@@ -41,7 +41,7 @@ The app uses `VITE_HOOTCAM_STREAMER_URL` (from `.env`) as the API base URL for a
 ### Prerequisites
 
 - Node.js 20+ (or 22+ for latest Vite)
-- **Hootcam Motion** running on your NUC (e.g. `uvicorn hootcam_motion.main:app --host 0.0.0.0 --port 8080`). Alternatively, the legacy all-in-one **Hootcam Server** on a Pi.
+- [**Hootcam Motion**](https://github.com/ManliestBen/hootcam-motion) running on your NUC (e.g. `uvicorn hootcam_motion.main:app --host 0.0.0.0 --port 8080`). Alternatively, the legacy all-in-one [**Hootcam Server**](https://github.com/ManliestBen/hootcam-server) on a Pi.
 
 ### Steps
 
@@ -99,9 +99,9 @@ Output is in `dist/`. Serve it with any static file server. The app will call th
 
 ## Related projects
 
-- **Hootcam Motion** – Backend that consumes RTSP streams and runs motion detection, recording, and API. The UI talks to this when using the 3-part architecture.
-- **Hootcam Streamer** – Lightweight RTSP streamer for the Pi (two cameras). Feeds Hootcam Motion.
-- **Hootcam Server** – Legacy all-in-one backend for the Pi (cameras + motion + recording + API). Can still be used with this UI if you run everything on the Pi.
+- [**Hootcam Motion**](https://github.com/ManliestBen/hootcam-motion) – Backend that consumes RTSP streams and runs motion detection, recording, and API. The UI talks to this when using the 3-part architecture.
+- [**Hootcam Streamer**](https://github.com/ManliestBen/hootcam-streamer) – Lightweight RTSP streamer for the Pi (two cameras). Feeds Hootcam Motion.
+- [**Hootcam Server**](https://github.com/ManliestBen/hootcam-server) – Legacy all-in-one backend for the Pi (cameras + motion + recording + API). Can still be used with this UI if you run everything on the Pi.
 
 ## .gitignore
 
