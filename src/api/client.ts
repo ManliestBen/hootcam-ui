@@ -1,6 +1,6 @@
 /**
  * API client for hootcam-server. All requests use HTTP Basic Auth when credentials are provided.
- * Base URL is taken from credentials or from VITE_HOOTCAM_SERVER_URL (e.g. in .env).
+ * Base URL is taken from credentials or from VITE_HOOTCAM_STREAMER_URL (e.g. in .env).
  */
 
 import type {
@@ -21,9 +21,9 @@ export interface AuthCredentials {
   password: string;
 }
 
-/** Server URL from env (VITE_HOOTCAM_SERVER_URL) or default. Used when building API URLs. */
+/** Server URL from env (VITE_HOOTCAM_STREAMER_URL) or default. Used when building API URLs. */
 export function getServerBaseUrl(): string {
-  const url = import.meta.env.VITE_HOOTCAM_SERVER_URL;
+  const url = import.meta.env.VITE_HOOTCAM_STREAMER_URL;
   return (typeof url === 'string' && url.trim() !== '') ? url.trim().replace(/\/$/, '') : 'http://localhost:8080';
 }
 

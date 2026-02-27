@@ -4,7 +4,7 @@ import { useTheme } from '../context/ThemeContext';
 
 /**
  * Public camera streams view. Visible without logging in.
- * Uses VITE_HOOTCAM_SERVER_URL for frame URLs; if server requires auth, each stream shows "Sign in to view".
+ * Uses VITE_HOOTCAM_STREAMER_URL for frame URLs; if server requires auth, each stream shows "Sign in to view".
  */
 export function PublicStreams() {
   const { theme, toggleTheme } = useTheme();
