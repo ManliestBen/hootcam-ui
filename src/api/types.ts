@@ -25,6 +25,8 @@ export interface GlobalConfig {
   stream_failure_sec?: number | null;
   /** When failed, re-attempt reading every this many seconds. Default 5. */
   stream_retry_sec?: number | null;
+  /** Base URL of Hootcam Streamer API (e.g. http://pi-ip:8084). When set, saving camera config pushes resolution/fps to the Pi. */
+  streamer_api_url?: string | null;
   database_busy_timeout?: number | null;
 }
 
@@ -44,6 +46,10 @@ export interface CameraConfig {
   width?: number | null;
   height?: number | null;
   framerate?: number | null;
+  /** Focus on Pi (streamer): continuous or manual. With manual, use lens_position for fixed focus. */
+  autofocus?: string | null;
+  /** Fixed focus when autofocus=manual. 0 = infinity, 0.5 ≈ 50 cm. */
+  lens_position?: number | null;
   minimum_frame_time?: number | null;
   rotate?: 0 | 90 | 180 | 270 | null;
   flip_axis?: FlipAxis | null;

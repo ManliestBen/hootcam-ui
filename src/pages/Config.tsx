@@ -25,6 +25,7 @@ export function Config() {
       stream_motion: global.stream_motion ?? undefined,
       stream_failure_sec: global.stream_failure_sec ?? undefined,
       stream_retry_sec: global.stream_retry_sec ?? undefined,
+      streamer_api_url: global.streamer_api_url ?? undefined,
       database_busy_timeout: global.database_busy_timeout ?? undefined,
       log_file: global.log_file ?? undefined,
     });
@@ -48,6 +49,7 @@ export function Config() {
     if (form.stream_motion != null) update.stream_motion = form.stream_motion;
     if (form.stream_failure_sec != null) update.stream_failure_sec = form.stream_failure_sec;
     if (form.stream_retry_sec != null) update.stream_retry_sec = form.stream_retry_sec;
+    if (form.streamer_api_url !== undefined) update.streamer_api_url = form.streamer_api_url || null;
     if (form.database_busy_timeout != null) update.database_busy_timeout = form.database_busy_timeout;
     if (form.log_file !== undefined) update.log_file = form.log_file || null;
     patchMutation.mutate(update);
@@ -160,6 +162,18 @@ export function Config() {
             />
             <p style={{ margin: '0.25rem 0 0', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
               When a camera is failed, re-attempt connection every this many seconds.
+            </p>
+          </div>
+          <div className="form-group">
+            <label>Streamer API URL (optional)</label>
+            <input
+              type="url"
+              value={form.streamer_api_url ?? ''}
+              onChange={(e) => setForm((f) => ({ ...f, streamer_api_url: e.target.value || undefined }))}
+              placeholder="http://pi-ip:8084"
+            />
+            <p style={{ margin: '0.25rem 0 0', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+              Base URL of Hootcam Streamer on the Pi. When set, saving camera config (resolution, fps) in Cameras → Config will push those values to the streamer so they take effect on the Pi.
             </p>
           </div>
           <div className="form-group">

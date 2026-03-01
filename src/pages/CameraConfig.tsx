@@ -49,6 +49,8 @@ export function CameraConfig() {
       width: data.width ?? undefined,
       height: data.height ?? undefined,
       framerate: data.framerate ?? undefined,
+      autofocus: data.autofocus ?? undefined,
+      lens_position: data.lens_position ?? undefined,
       threshold: data.threshold ?? undefined,
       event_gap: data.event_gap ?? undefined,
       pre_capture: data.pre_capture ?? undefined,
@@ -175,7 +177,7 @@ export function CameraConfig() {
             <p style={{ margin: '0.25rem 0 0', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
               {apiResolutions.length > 0
                 ? 'Values from the connected camera hardware. Restart the server after changing resolution.'
-                : 'Common resolutions. Restart the server after changing resolution.'}
+                : 'When using a stream URL (e.g. Hootcam Streamer), resolution is set on the Pi in the streamer config (cam0/cam1 width and height). This field is for reference only and does not change the incoming stream.'}
             </p>
           </div>
           <div className="form-group">
@@ -187,6 +189,34 @@ export function CameraConfig() {
               value={form.framerate ?? ''}
               onChange={(e) => setForm((f) => ({ ...f, framerate: e.target.value ? parseInt(e.target.value, 10) : undefined }))}
             />
+          </div>
+          <div className="form-group">
+            <label>Focus (streamer)</label>
+            <select
+              value={form.autofocus ?? 'continuous'}
+              onChange={(e) => setForm((f) => ({ ...f, autofocus: e.target.value || undefined }))}
+            >
+              <option value="continuous">Continuous (autofocus)</option>
+              <option value="manual">Manual (fixed focus)</option>
+            </select>
+            <p style={{ margin: '0.25rem 0 0', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+              When using Hootcam Streamer, this is pushed to the Pi. Manual uses the lens position below for a fixed focus.
+            </p>
+          </div>
+          <div className="form-group">
+            <label>Lens position (fixed focus)</label>
+            <input
+              type="number"
+              min={0}
+              max={10}
+              step={0.1}
+              value={form.lens_position ?? ''}
+              onChange={(e) => setForm((f) => ({ ...f, lens_position: e.target.value ? parseFloat(e.target.value) : undefined }))}
+              placeholder="0 = infinity, 0.5 ≈ 50 cm"
+            />
+            <p style={{ margin: '0.25rem 0 0', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+              Only used when Focus is Manual. 0 = infinity, 0.5 ≈ 50 cm. Requires a camera that supports it (e.g. Pi Camera Module 3).
+            </p>
           </div>
           <div className="form-group">
             <label>Motion threshold (pixels)</label>

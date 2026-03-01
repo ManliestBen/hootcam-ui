@@ -27,10 +27,10 @@ The app uses `VITE_HOOTCAM_STREAMER_URL` (from `.env`) as the API base URL for a
 
 - **Live view (public)** – Camera 0 and Camera 1 streams on the home page; no login required. Theme toggle and “Sign in” in the header.
 - **Dashboard** – After sign-in: live previews and detection status per camera, with links to controls and config.
-- **Cameras** – Per-camera live view, connection status, start/pause detection, snapshot, and link to camera config. When using Hootcam Motion, set each camera’s **stream_url** in config to the Pi’s streams (e.g. with Hootcam Streamer: `http://pi-ip:8080/stream` and `http://pi-ip:8081/stream`).
+- **Cameras** – Per-camera live view, connection status, start/pause detection, snapshot, and link to camera config. When using Hootcam Motion, set each camera’s **stream_url** in config to the Pi’s streams (e.g. with Hootcam Streamer: `http://pi-ip:8082/stream` and `http://pi-ip:8083/stream`).
 - **Events** – List motion events with filters; event detail with file thumbnails.
 - **Files** – Browse pictures and movies with filters; view images and videos.
-- **Config** – Global server config (log level, stream quality, etc.).
+- **Config** – Global server config (log level, stream quality, **Streamer API URL** for pushing resolution/fps to the Pi, etc.).
 - **Storage** – View and set recording path (including auto-detected SSD).
 - **Camera config** – Per-camera settings (motion threshold, event gap, **stream_url** for the Pi’s stream, etc.).
 - **Account** – Change password (HTTP Basic Auth).
