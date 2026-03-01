@@ -9,8 +9,8 @@ Hootcam can run as three separate apps:
 | App | Where it runs | Role |
 |-----|----------------|------|
 | **Hootcam UI** ([hootcam-ui](https://github.com/ManliestBen/hootcam-ui)) | Any device with a browser | Web interface: live view, detection controls, events, files, config. |
-| [**Hootcam Motion**](https://github.com/ManliestBen/hootcam-motion) | NUC or PC | Consumes RTSP streams, runs motion detection and recording, serves the REST API and MJPEG streams. **This is the server the UI talks to.** |
-| [**Hootcam Streamer**](https://github.com/ManliestBen/hootcam-streamer) | Raspberry Pi | Publishes two RTSP streams (cam0, cam1) from CSI cameras. No motion or recording. |
+| [**Hootcam Motion**](https://github.com/ManliestBen/hootcam-motion) | NUC or PC | Consumes Pi streams (MJPEG or RTSP), runs motion detection and recording, serves the REST API and MJPEG streams. **This is the server the UI talks to.** |
+| [**Hootcam Streamer**](https://github.com/ManliestBen/hootcam-streamer) | Raspberry Pi | Publishes two MJPEG streams (cam0:8080, cam1:8081) from CSI cameras. No motion or recording. |
 
 You point the UI at **Hootcam Motion** (the NUC). Motion pulls video from the Pi’s RTSP streams and does all processing. No direct connection from the UI to the Pi is required.
 
@@ -27,12 +27,12 @@ The app uses `VITE_HOOTCAM_STREAMER_URL` (from `.env`) as the API base URL for a
 
 - **Live view (public)** – Camera 0 and Camera 1 streams on the home page; no login required. Theme toggle and “Sign in” in the header.
 - **Dashboard** – After sign-in: live previews and detection status per camera, with links to controls and config.
-- **Cameras** – Per-camera live view, connection status, start/pause detection, snapshot, and link to camera config. When using Hootcam Motion, set each camera’s **stream_url** (RTSP) in config (e.g. `rtsp://pi-ip:8554/cam0`).
+- **Cameras** – Per-camera live view, connection status, start/pause detection, snapshot, and link to camera config. When using Hootcam Motion, set each camera’s **stream_url** in config to the Pi’s streams (e.g. with Hootcam Streamer: `http://pi-ip:8080/stream` and `http://pi-ip:8081/stream`).
 - **Events** – List motion events with filters; event detail with file thumbnails.
 - **Files** – Browse pictures and movies with filters; view images and videos.
 - **Config** – Global server config (log level, stream quality, etc.).
 - **Storage** – View and set recording path (including auto-detected SSD).
-- **Camera config** – Per-camera settings (motion threshold, event gap, **stream_url** for RTSP, etc.).
+- **Camera config** – Per-camera settings (motion threshold, event gap, **stream_url** for the Pi’s stream, etc.).
 - **Account** – Change password (HTTP Basic Auth).
 - **Light / dark mode** – Theme toggle with persistence.
 
@@ -85,7 +85,7 @@ The app uses `VITE_HOOTCAM_STREAMER_URL` (from `.env`) as the API base URL for a
 
 | Variable | Description |
 |----------|-------------|
-| `VITE_HOOTCAM_STREAMER_URL` | API base URL for the backend (e.g. Hootcam Motion on NUC: `http://nuc-ip:8080`). Used for all API requests and for public camera streams. Defaults to `http://localhost:8080` if unset. |
+| `VITE_HOOTCAM_STREAMER_URL` | API base URL for the backend (e.g. Hootcam Motion on NUC: `http://nuc-ip:8080`). Used for all API requests and for public camera streams. Defaults to `http://localhost:8080` if unset. When set, this **overrides** any server URL stored from a previous login, so changing `.env` and refreshing the page (dev) or rebuilding (prod) is enough. |
 
 ## Build
 
@@ -99,8 +99,8 @@ Output is in `dist/`. Serve it with any static file server. The app will call th
 
 ## Related projects
 
-- [**Hootcam Motion**](https://github.com/ManliestBen/hootcam-motion) – Backend that consumes RTSP streams and runs motion detection, recording, and API. The UI talks to this when using the 3-part architecture.
-- [**Hootcam Streamer**](https://github.com/ManliestBen/hootcam-streamer) – Lightweight RTSP streamer for the Pi (two cameras). Feeds Hootcam Motion.
+- [**Hootcam Motion**](https://github.com/ManliestBen/hootcam-motion) – Backend that consumes Pi streams (MJPEG or RTSP) and runs motion detection, recording, and API. The UI talks to this when using the 3-part architecture.
+- [**Hootcam Streamer**](https://github.com/ManliestBen/hootcam-streamer) – Lightweight MJPEG streamer for the Pi (two cameras via Spyglass). Feeds Hootcam Motion; set each camera’s stream_url to `http://<pi-ip>:8080/stream` and `http://<pi-ip>:8081/stream`.
 - [**Hootcam Server**](https://github.com/ManliestBen/hootcam-server) – Legacy all-in-one backend for the Pi (cameras + motion + recording + API). Can still be used with this UI if you run everything on the Pi.
 
 ## .gitignore

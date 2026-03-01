@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { getServerBaseUrl } from '../api/client';
+import { getBaseUrl } from '../api/client';
 
 const MJPEG_BOUNDARY = 'frame';
 
@@ -18,7 +18,7 @@ export function CameraLiveView({ cameraIndex }: { cameraIndex: number }) {
   const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    const base = credentials?.apiBaseUrl?.replace(/\/$/, '') ?? getServerBaseUrl();
+    const base = getBaseUrl(credentials);
     const url = `${base}/cameras/${cameraIndex}/stream`;
 
     const authHeader =

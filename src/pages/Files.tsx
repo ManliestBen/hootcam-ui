@@ -1,10 +1,12 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { FileContentView } from '../components/FileContentView';
+import type { FileRecord } from '../api/types';
 
 export function Files() {
   const { api, credentials } = useAuth();
+  const queryClient = useQueryClient();
   const [cameraFilter, setCameraFilter] = useState<number | ''>('');
   const [fileTypeFilter, setFileTypeFilter] = useState<string>('');
   const [limit] = useState(200);
@@ -25,6 +27,20 @@ export function Files() {
     queryKey: ['cameras'],
     queryFn: () => api.listCameras(),
   });
+
+  const deleteMutation = useMutation({
+    mutationFn: (fileId: number) => api.deleteFile(fileId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['files-list'] });
+      queryClient.invalidateQueries({ queryKey: ['files'] });
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+    },
+  });
+
+  function handleDelete(f: FileRecord) {
+    if (!window.confirm(`Delete this ${f.file_type}? This cannot be undone.`)) return;
+    deleteMutation.mutate(f.id);
+  }
 
   if (isLoading) return <div className="loading">Loading files…</div>;
   if (error) return <div className="error-message">{String(error)}</div>;
@@ -86,6 +102,15 @@ export function Files() {
               {f.file_type} · {f.timestamp}
               {f.event_id != null && ` · Event ${f.event_id}`}
             </p>
+            <button
+              type="button"
+              className="secondary"
+              style={{ marginTop: '0.5rem' }}
+              disabled={deleteMutation.isPending}
+              onClick={() => handleDelete(f)}
+            >
+              Delete
+            </button>
           </div>
         ))}
       </div>

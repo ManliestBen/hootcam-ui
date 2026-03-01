@@ -27,8 +27,12 @@ export function getServerBaseUrl(): string {
   return (typeof url === 'string' && url.trim() !== '') ? url.trim().replace(/\/$/, '') : 'http://localhost:8080';
 }
 
-function getBaseUrl(creds: AuthCredentials | null): string {
-  return (creds?.apiBaseUrl?.trim() ? creds.apiBaseUrl.replace(/\/$/, '') : null) ?? getServerBaseUrl();
+/** Base URL for requests: env (VITE_HOOTCAM_STREAMER_URL) wins so .env changes apply after refresh; else stored login URL; else default. */
+export function getBaseUrl(creds: AuthCredentials | null): string {
+  const fromEnv = getServerBaseUrl();
+  const envIsSet = typeof import.meta.env.VITE_HOOTCAM_STREAMER_URL === 'string' && (import.meta.env.VITE_HOOTCAM_STREAMER_URL as string).trim() !== '';
+  if (envIsSet) return fromEnv;
+  return (creds?.apiBaseUrl?.trim() ? creds.apiBaseUrl.replace(/\/$/, '') : null) ?? fromEnv;
 }
 
 function b64(s: string): string {
@@ -196,6 +200,8 @@ export function createApi(creds: AuthCredentials | null) {
     },
     getFileBlob: (fileId: number) =>
       requestBlob(creds, `/files/${fileId}/content`),
+    deleteFile: (fileId: number) =>
+      request<void>(creds, `/files/${fileId}`, { method: 'DELETE' }),
   };
 }
 

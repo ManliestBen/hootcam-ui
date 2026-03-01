@@ -23,6 +23,8 @@ export function Config() {
       stream_localhost: global.stream_localhost ?? undefined,
       stream_grey: global.stream_grey ?? undefined,
       stream_motion: global.stream_motion ?? undefined,
+      stream_failure_sec: global.stream_failure_sec ?? undefined,
+      stream_retry_sec: global.stream_retry_sec ?? undefined,
       database_busy_timeout: global.database_busy_timeout ?? undefined,
       log_file: global.log_file ?? undefined,
     });
@@ -44,6 +46,8 @@ export function Config() {
     if (form.stream_localhost != null) update.stream_localhost = form.stream_localhost;
     if (form.stream_grey != null) update.stream_grey = form.stream_grey;
     if (form.stream_motion != null) update.stream_motion = form.stream_motion;
+    if (form.stream_failure_sec != null) update.stream_failure_sec = form.stream_failure_sec;
+    if (form.stream_retry_sec != null) update.stream_retry_sec = form.stream_retry_sec;
     if (form.database_busy_timeout != null) update.database_busy_timeout = form.database_busy_timeout;
     if (form.log_file !== undefined) update.log_file = form.log_file || null;
     patchMutation.mutate(update);
@@ -129,6 +133,34 @@ export function Config() {
               />
               Limit stream FPS when no motion
             </label>
+          </div>
+          <div className="form-group">
+            <label>Stream failure (seconds)</label>
+            <input
+              type="number"
+              min={3}
+              max={300}
+              value={form.stream_failure_sec ?? ''}
+              onChange={(e) => setForm((f) => ({ ...f, stream_failure_sec: e.target.value ? parseInt(e.target.value, 10) : undefined }))}
+              placeholder="15"
+            />
+            <p style={{ margin: '0.25rem 0 0', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+              Seconds with no frame before marking camera failed. Higher = more tolerant of brief dropouts.
+            </p>
+          </div>
+          <div className="form-group">
+            <label>Stream retry (seconds)</label>
+            <input
+              type="number"
+              min={2}
+              max={60}
+              value={form.stream_retry_sec ?? ''}
+              onChange={(e) => setForm((f) => ({ ...f, stream_retry_sec: e.target.value ? parseInt(e.target.value, 10) : undefined }))}
+              placeholder="5"
+            />
+            <p style={{ margin: '0.25rem 0 0', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+              When a camera is failed, re-attempt connection every this many seconds.
+            </p>
           </div>
           <div className="form-group">
             <label>Database busy timeout (ms, 0 = immediate)</label>

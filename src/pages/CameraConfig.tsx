@@ -45,6 +45,7 @@ export function CameraConfig() {
     setForm({
       camera_name: data.camera_name ?? undefined,
       camera_id: data.camera_id ?? undefined,
+      stream_url: data.stream_url ?? undefined,
       width: data.width ?? undefined,
       height: data.height ?? undefined,
       framerate: data.framerate ?? undefined,
@@ -129,6 +130,18 @@ export function CameraConfig() {
               value={form.camera_id ?? ''}
               onChange={(e) => setForm((f) => ({ ...f, camera_id: e.target.value ? parseInt(e.target.value, 10) : undefined }))}
             />
+          </div>
+          <div className="form-group">
+            <label>Stream URL</label>
+            <input
+              type="url"
+              placeholder="http://pi-ip:8082/stream"
+              value={form.stream_url ?? ''}
+              onChange={(e) => setForm((f) => ({ ...f, stream_url: e.target.value || undefined }))}
+            />
+            <p style={{ margin: '0.25rem 0 0', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+              Where to pull video from (e.g. Hootcam Streamer: <code>http://&lt;pi-ip&gt;:8082/stream</code> for cam0, <code>:8083/stream</code> for cam1).
+            </p>
           </div>
           <div className="form-group">
             <label>Resolution</label>

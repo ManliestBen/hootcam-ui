@@ -21,6 +21,10 @@ export interface GlobalConfig {
   stream_maxrate?: number | null;
   stream_grey?: boolean | null;
   stream_motion?: boolean | null;
+  /** Seconds with no frame before marking camera failed. Default 15. */
+  stream_failure_sec?: number | null;
+  /** When failed, re-attempt reading every this many seconds. Default 5. */
+  stream_retry_sec?: number | null;
   database_busy_timeout?: number | null;
 }
 
@@ -35,6 +39,8 @@ export type PictureType = 'jpeg' | 'webp' | 'ppm' | 'grey';
 export interface CameraConfig {
   camera_name?: string | null;
   camera_id?: number | null;
+  /** Video stream URL (e.g. from Hootcam Streamer: http://pi-ip:8082/stream). Required for motion/recording. */
+  stream_url?: string | null;
   width?: number | null;
   height?: number | null;
   framerate?: number | null;
